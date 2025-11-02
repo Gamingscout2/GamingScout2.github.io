@@ -68,12 +68,14 @@
         }
         .dice-controls {
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
             padding: 10px;
             background-color: #F0F0F0;
             border: 1px solid #C0C0C0;
+            gap: 10px;
         }
         .quantity-control {
             display: flex;
@@ -84,6 +86,21 @@
             width: 50px;
             padding: 5px;
             border: 1px solid #808080;
+        }
+        .multiplier-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .multiplier-control input {
+            width: 50px;
+            padding: 5px;
+            border: 1px solid #808080;
+        }
+        .toggle-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         button {
             background-color: #C0C0C0;
@@ -136,6 +153,14 @@
             padding-top: 10px;
             border-top: 2px solid #000080;
             color: #FF0000;
+        }
+        .multiplied-total {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid #FF0000;
+            color: #000080;
         }
         .stats-box {
             background-color: #F0F8FF;
@@ -195,9 +220,59 @@
             padding-top: 5px;
             border-top: 1px solid #C0C0C0;
         }
+        .history-multiplied {
+            font-weight: bold;
+            color: #000080;
+            margin-top: 5px;
+        }
         .buttons {
             text-align: center;
             margin: 15px 0;
+        }
+        .mixed-dice-controls {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #FFF8DC;
+            border: 1px solid #C0C0C0;
+        }
+        .mixed-dice-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+        .mixed-dice-row input {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid #808080;
+        }
+        .mixed-dice-row select {
+            padding: 5px;
+            border: 1px solid #808080;
+        }
+        .add-dice-button {
+            background-color: #000080;
+            color: white;
+            border: 2px outset #000080;
+        }
+        .remove-dice-button {
+            background-color: #800000;
+            color: white;
+            border: 2px outset #800000;
+        }
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+        .toggle-checkbox {
+            width: auto;
+        }
+        .mixed-dice-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -207,7 +282,7 @@
     <h1>SirObiVan's Dice Roller!</h1>
 
     <!-- Marquee for classic scrolling text -->
-    <marquee class="marquee">Roll the dice for your tabletop gaming needs!</marquee>
+    <marquee class="marquee">Roll the dice for your tabletop gaming needs! Now with damage multipliers and mixed dice!</marquee>
 
     <!-- Navigation links -->
     <div class="nav">
@@ -253,10 +328,46 @@
                     </div>
                 </div>
                 
+                <!-- Mixed Dice Section -->
+                <div class="mixed-dice-controls">
+                    <h3>Mixed Dice (for spells and such)</h3>
+                    <div id="mixed-dice-container">
+                        <div class="mixed-dice-row">
+                            <input type="number" min="1" max="100" value="1" class="mixed-quantity">
+                            <select class="mixed-sides">
+                                <option value="4">d4</option>
+                                <option value="6" selected>d6</option>
+                                <option value="8">d8</option>
+                                <option value="10">d10</option>
+                                <option value="12">d12</option>
+                                <option value="20">d20</option>
+                                <option value="100">d100</option>
+                            </select>
+                            <button class="remove-dice-button" onclick="removeMixedDice(this)" disabled>Remove</button>
+                        </div>
+                    </div>
+                    <div class="mixed-dice-buttons">
+                        <button class="add-dice-button" onclick="addMixedDice()">Add More Dice</button>
+                        <button class="add-dice-button" onclick="addSelectedDice()">Add Selected Dice</button>
+                    </div>
+                </div>
+                
                 <div class="dice-controls">
                     <div class="quantity-control">
                         <label for="quantity">Quantity:</label>
                         <input type="number" id="quantity" min="1" max="100" value="1">
+                    </div>
+                    
+                    <div class="multiplier-control">
+                        <label for="multiplier">Multiplier:</label>
+                        <input type="number" id="multiplier" min="1" max="100" value="1">
+                    </div>
+                    
+                    <div class="toggle-control">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="apply-multiplier" class="toggle-checkbox">
+                            Apply Multiplier
+                        </label>
                     </div>
                     
                     <button id="clear-results">Clear Results</button>
@@ -272,7 +383,15 @@
                 </div>
                 
                 <div class="history">
-                    <h3>Roll History</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3>Roll History</h3>
+                        <div class="toggle-control">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="cumulative-stats" class="toggle-checkbox" checked>
+                                Cumulative Statistics
+                            </label>
+                        </div>
+                    </div>
                     <div class="history-list" id="history-container">
                         <!-- History items will be added here -->
                     </div>
@@ -301,10 +420,87 @@
 </div>
 
 <script>
+    // Mixed dice functions
+    function addMixedDice() {
+        const container = document.getElementById('mixed-dice-container');
+        const newRow = document.createElement('div');
+        newRow.className = 'mixed-dice-row';
+        newRow.innerHTML = `
+            <input type="number" min="1" max="100" value="1" class="mixed-quantity">
+            <select class="mixed-sides">
+                <option value="4">d4</option>
+                <option value="6" selected>d6</option>
+                <option value="8">d8</option>
+                <option value="10">d10</option>
+                <option value="12">d12</option>
+                <option value="20">d20</option>
+                <option value="100">d100</option>
+            </select>
+            <button class="remove-dice-button" onclick="removeMixedDice(this)">Remove</button>
+        `;
+        container.appendChild(newRow);
+        
+        // Enable remove buttons if there's more than one row
+        const removeButtons = container.querySelectorAll('.remove-dice-button');
+        if (removeButtons.length > 1) {
+            removeButtons.forEach(btn => btn.disabled = false);
+        }
+    }
+    
+    function removeMixedDice(button) {
+        const container = document.getElementById('mixed-dice-container');
+        const rows = container.querySelectorAll('.mixed-dice-row');
+        
+        if (rows.length > 1) {
+            button.parentElement.remove();
+            
+            // Disable remove button if only one row left
+            const remainingButtons = container.querySelectorAll('.remove-dice-button');
+            if (remainingButtons.length === 1) {
+                remainingButtons[0].disabled = true;
+            }
+        }
+    }
+    
+    function addSelectedDice() {
+        const activeDice = document.querySelector('.dice-option.active');
+        if (!activeDice) return;
+        
+        const sides = parseInt(activeDice.getAttribute('data-sides'));
+        const quantity = parseInt(document.getElementById('quantity').value) || 1;
+        
+        const container = document.getElementById('mixed-dice-container');
+        const newRow = document.createElement('div');
+        newRow.className = 'mixed-dice-row';
+        newRow.innerHTML = `
+            <input type="number" min="1" max="100" value="${quantity}" class="mixed-quantity">
+            <select class="mixed-sides">
+                <option value="4" ${sides === 4 ? 'selected' : ''}>d4</option>
+                <option value="6" ${sides === 6 ? 'selected' : ''}>d6</option>
+                <option value="8" ${sides === 8 ? 'selected' : ''}>d8</option>
+                <option value="10" ${sides === 10 ? 'selected' : ''}>d10</option>
+                <option value="12" ${sides === 12 ? 'selected' : ''}>d12</option>
+                <option value="20" ${sides === 20 ? 'selected' : ''}>d20</option>
+                <option value="100" ${sides === 100 ? 'selected' : ''}>d100</option>
+            </select>
+            <button class="remove-dice-button" onclick="removeMixedDice(this)">Remove</button>
+        `;
+        container.appendChild(newRow);
+        
+        // Enable remove buttons if there's more than one row
+        const removeButtons = container.querySelectorAll('.remove-dice-button');
+        if (removeButtons.length > 1) {
+            removeButtons.forEach(btn => btn.disabled = false);
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         // DOM elements
         const diceOptions = document.querySelectorAll('.dice-option');
         const quantityInput = document.getElementById('quantity');
+        const multiplierInput = document.getElementById('multiplier');
+        const applyMultiplierCheckbox = document.getElementById('apply-multiplier');
+        const cumulativeStatsCheckbox = document.getElementById('cumulative-stats');
         const rollButton = document.getElementById('roll-button');
         const clearButton = document.getElementById('clear-results');
         const resultsContainer = document.getElementById('results-container');
@@ -314,6 +510,7 @@
         // State variables
         let selectedSides = 4;
         let rollHistory = [];
+        let allRolls = []; // For cumulative statistics
         
         // Initialize dice selection
         diceOptions.forEach(option => {
@@ -330,6 +527,8 @@
         // Roll button event listener
         rollButton.addEventListener('click', function() {
             const quantity = parseInt(quantityInput.value);
+            const multiplier = parseInt(multiplierInput.value);
+            
             if (isNaN(quantity) || quantity < 1) {
                 alert('Please enter a valid quantity (1-100)');
                 return;
@@ -340,7 +539,18 @@
                 return;
             }
             
-            rollDice(selectedSides, quantity);
+            if (isNaN(multiplier) || multiplier < 1) {
+                alert('Please enter a valid multiplier (1-100)');
+                return;
+            }
+            
+            // Check if we have mixed dice configured
+            const mixedRows = document.querySelectorAll('.mixed-dice-row');
+            if (mixedRows.length > 0) {
+                rollMixedDice(multiplier);
+            } else {
+                rollDice(selectedSides, quantity, multiplier);
+            }
         });
         
         // Clear results button
@@ -348,6 +558,7 @@
             resultsContainer.innerHTML = '<p>Select dice and click "Roll Dice" to get started!</p>';
             statsContainer.innerHTML = '<p>Roll some dice to see statistics</p>';
             rollHistory = [];
+            allRolls = [];
             updateHistoryDisplay();
         });
         
@@ -383,8 +594,137 @@
             return result;
         }
         
+        // Function to roll mixed dice (for spells like Meteor Swarm)
+        async function rollMixedDice(multiplier) {
+            // Clear previous results
+            resultsContainer.innerHTML = '';
+            
+            // Get mixed dice configuration
+            const mixedRows = document.querySelectorAll('.mixed-dice-row');
+            const diceConfigs = [];
+            
+            mixedRows.forEach(row => {
+                const quantity = parseInt(row.querySelector('.mixed-quantity').value);
+                const sides = parseInt(row.querySelector('.mixed-sides').value);
+                
+                if (!isNaN(quantity) && quantity > 0 && quantity <= 100) {
+                    diceConfigs.push({ quantity, sides });
+                }
+            });
+            
+            if (diceConfigs.length === 0) {
+                alert('Please configure at least one set of dice');
+                return;
+            }
+            
+            // Show rolling animation
+            let description = diceConfigs.map(config => `${config.quantity}d${config.sides}`).join(' + ');
+            resultsContainer.innerHTML = `<p>Rolling ${description}...</p>`;
+            
+            try {
+                const allResults = [];
+                const rollDetails = [];
+                
+                // Roll each type of dice
+                for (const config of diceConfigs) {
+                    const { quantity, sides } = config;
+                    const results = [];
+                    
+                    // Create promises for all dice rolls of this type
+                    const rollPromises = [];
+                    for (let i = 0; i < quantity; i++) {
+                        rollPromises.push(getSecureRandomInt(1, sides));
+                    }
+                    
+                    // Wait for all rolls to complete
+                    const typeResults = await Promise.all(rollPromises);
+                    results.push(...typeResults);
+                    
+                    // Store details for display
+                    rollDetails.push({
+                        sides: sides,
+                        quantity: quantity,
+                        results: typeResults,
+                        total: typeResults.reduce((sum, val) => sum + val, 0)
+                    });
+                    
+                    allResults.push(...typeResults);
+                }
+                
+                // Calculate totals
+                const baseTotal = allResults.reduce((sum, value) => sum + value, 0);
+                const finalTotal = applyMultiplierCheckbox.checked ? baseTotal * multiplier : baseTotal;
+                
+                // Display results
+                resultsContainer.innerHTML = '';
+                
+                rollDetails.forEach(detail => {
+                    const typeHeader = document.createElement('div');
+                    typeHeader.className = 'result-item';
+                    typeHeader.innerHTML = `<strong>${detail.quantity}d${detail.sides}:</strong>`;
+                    resultsContainer.appendChild(typeHeader);
+                    
+                    detail.results.forEach((result, index) => {
+                        const resultItem = document.createElement('div');
+                        resultItem.className = 'result-item';
+                        resultItem.innerHTML = `
+                            <span>d${detail.sides} ${index + 1}:</span>
+                            <span>${result}</span>
+                        `;
+                        resultsContainer.appendChild(resultItem);
+                    });
+                    
+                    const typeTotal = document.createElement('div');
+                    typeTotal.className = 'result-item';
+                    typeTotal.innerHTML = `
+                        <span><em>Subtotal:</em></span>
+                        <span><em>${detail.total}</em></span>
+                    `;
+                    resultsContainer.appendChild(typeTotal);
+                });
+                
+                // Display totals
+                const totalElement = document.createElement('div');
+                totalElement.className = 'total-result';
+                totalElement.textContent = `Base Total: ${baseTotal}`;
+                resultsContainer.appendChild(totalElement);
+                
+                if (applyMultiplierCheckbox.checked) {
+                    const multipliedElement = document.createElement('div');
+                    multipliedElement.className = 'multiplied-total';
+                    multipliedElement.textContent = `Final Damage: ${baseTotal} × ${multiplier} = ${finalTotal}`;
+                    resultsContainer.appendChild(multipliedElement);
+                }
+                
+                // Update statistics
+                updateStatistics(allResults, 'Mixed', baseTotal);
+                
+                // Add to history
+                const historyEntry = {
+                    timestamp: new Date().toLocaleString(),
+                    type: 'mixed',
+                    configs: diceConfigs,
+                    results: rollDetails,
+                    baseTotal: baseTotal,
+                    multiplier: applyMultiplierCheckbox.checked ? multiplier : 1,
+                    finalTotal: finalTotal
+                };
+                
+                rollHistory.unshift(historyEntry);
+                if (rollHistory.length > 10) {
+                    rollHistory.pop();
+                }
+                
+                updateHistoryDisplay();
+                
+            } catch (error) {
+                console.error('Error rolling mixed dice:', error);
+                resultsContainer.innerHTML = `<p style="color: #FF0000;">Error: ${error.message}. Please try again.</p>`;
+            }
+        }
+        
         // Function to roll dice
-        async function rollDice(sides, quantity) {
+        async function rollDice(sides, quantity, multiplier) {
             // Clear previous results
             resultsContainer.innerHTML = '';
             
@@ -408,8 +748,9 @@
                     throw new Error(`Generated ${invalidResults.length} invalid dice results`);
                 }
                 
-                // Calculate total
-                const total = results.reduce((sum, value) => sum + value, 0);
+                // Calculate totals
+                const baseTotal = results.reduce((sum, value) => sum + value, 0);
+                const finalTotal = applyMultiplierCheckbox.checked ? baseTotal * multiplier : baseTotal;
                 
                 // Display results
                 resultsContainer.innerHTML = '';
@@ -434,24 +775,34 @@
                     resultsContainer.appendChild(resultItem);
                 });
                 
-                // Display total if multiple dice
+                // Display totals
                 if (quantity > 1) {
                     const totalElement = document.createElement('div');
                     totalElement.className = 'total-result';
-                    totalElement.textContent = `Total: ${total}`;
+                    totalElement.textContent = `Base Total: ${baseTotal}`;
                     resultsContainer.appendChild(totalElement);
                 }
                 
+                if (applyMultiplierCheckbox.checked && multiplier > 1) {
+                    const multipliedElement = document.createElement('div');
+                    multipliedElement.className = 'multiplied-total';
+                    multipliedElement.textContent = `Final Damage: ${baseTotal} × ${multiplier} = ${finalTotal}`;
+                    resultsContainer.appendChild(multipliedElement);
+                }
+                
                 // Update statistics
-                updateStatistics(results, sides);
+                updateStatistics(results, sides, baseTotal);
                 
                 // Add to history
                 const historyEntry = {
                     timestamp: new Date().toLocaleString(),
+                    type: 'single',
                     sides: sides,
                     quantity: quantity,
                     results: results,
-                    total: total
+                    baseTotal: baseTotal,
+                    multiplier: applyMultiplierCheckbox.checked ? multiplier : 1,
+                    finalTotal: finalTotal
                 };
                 
                 rollHistory.unshift(historyEntry);
@@ -468,18 +819,28 @@
         }
         
         // Function to update statistics display
-        function updateStatistics(results, sides) {
-            // Calculate mean and standard deviation
-            const mean = results.reduce((a, b) => a + b, 0) / results.length;
-            const variance = results.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / results.length;
+        function updateStatistics(results, sides, baseTotal) {
+            // Add to cumulative rolls if enabled
+            if (cumulativeStatsCheckbox.checked) {
+                allRolls.push(...results);
+            } else {
+                allRolls = [...results]; // Only keep current rolls
+            }
+            
+            // Calculate statistics
+            const mean = allRolls.reduce((a, b) => a + b, 0) / allRolls.length;
+            const variance = allRolls.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / allRolls.length;
             const stdDev = Math.sqrt(variance);
             
-            // Expected values for fair dice
-            const expectedMean = (sides + 1) / 2;
-            const expectedStdDev = Math.sqrt((Math.pow(sides, 2) - 1) / 12);
+            // Expected values for fair dice (only for single dice type)
+            let expectedMean, expectedStdDev;
+            if (sides !== 'Mixed') {
+                expectedMean = (sides + 1) / 2;
+                expectedStdDev = Math.sqrt((Math.pow(sides, 2) - 1) / 12);
+            }
             
             // Update stats display
-            statsContainer.innerHTML = `
+            let statsHTML = `
                 <div class="stat-item">
                     <span>Mean:</span>
                     <span>${mean.toFixed(2)}</span>
@@ -489,14 +850,31 @@
                     <span>${stdDev.toFixed(2)}</span>
                 </div>
                 <div class="stat-item">
-                    <span>Expected Mean:</span>
-                    <span>${expectedMean.toFixed(2)}</span>
+                    <span>Rolls:</span>
+                    <span>${allRolls.length}</span>
                 </div>
                 <div class="stat-item">
-                    <span>Rolls:</span>
-                    <span>${results.length}</span>
+                    <span>Last Roll Total:</span>
+                    <span>${baseTotal}</span>
                 </div>
             `;
+            
+            if (sides !== 'Mixed') {
+                statsHTML += `
+                    <div class="stat-item">
+                        <span>Expected Mean:</span>
+                        <span>${expectedMean.toFixed(2)}</span>
+                    </div>
+                `;
+            }
+            
+            if (cumulativeStatsCheckbox.checked) {
+                statsHTML += `<div class="stat-item"><span><em>Cumulative Stats</em></span></div>`;
+            } else {
+                statsHTML += `<div class="stat-item"><span><em>Current Roll Stats</em></span></div>`;
+            }
+            
+            statsContainer.innerHTML = statsHTML;
         }
         
         // Function to update history display
@@ -512,37 +890,61 @@
                 const historyItem = document.createElement('div');
                 historyItem.className = 'history-item';
                 
-                // Format the results array nicely
-                let resultsText;
-                if (entry.sides === 2) {
-                    // Format coin flip results
-                    const coinResults = entry.results.map(r => r === 1 ? 'Heads' : 'Tails');
-                    resultsText = coinResults.join(', ');
+                let resultsText, rollDescription;
+                
+                if (entry.type === 'mixed') {
+                    // Format mixed dice results
+                    const typeResults = entry.results.map(result => 
+                        `${result.quantity}d${result.sides}: [${result.results.join(', ')}] = ${result.total}`
+                    );
+                    resultsText = typeResults.join('<br>');
+                    rollDescription = entry.configs.map(config => `${config.quantity}d${config.sides}`).join(' + ');
                 } else {
-                    // Show all results in a compact format
-                    resultsText = `[${entry.results.join(', ')}]`;
+                    // Format single dice type results
+                    if (entry.sides === 2) {
+                        const coinResults = entry.results.map(r => r === 1 ? 'Heads' : 'Tails');
+                        resultsText = coinResults.join(', ');
+                    } else {
+                        resultsText = `[${entry.results.join(', ')}]`;
+                    }
+                    rollDescription = `${entry.quantity}d${entry.sides}`;
                 }
                 
                 // Create the history entry
                 historyItem.innerHTML = `
                     <div class="history-header">
                         <span>${entry.timestamp}</span>
-                        <span>${entry.quantity}d${entry.sides}</span>
+                        <span>${rollDescription}</span>
                     </div>
                     <div class="history-details">
                         <div class="history-results">
                             ${resultsText}
                         </div>
-                        ${entry.quantity > 1 ? `<div class="history-total">Total: ${entry.total}</div>` : ''}
+                        <div class="history-total">Base Total: ${entry.baseTotal}</div>
+                        ${entry.multiplier > 1 ? `<div class="history-multiplied">Final Damage: ${entry.baseTotal} × ${entry.multiplier} = ${entry.finalTotal}</div>` : ''}
                     </div>
                 `;
                 
                 historyContainer.appendChild(historyItem);
             });
         }
+        
+        // Add event listener for cumulative stats toggle
+        cumulativeStatsCheckbox.addEventListener('change', function() {
+            if (allRolls.length > 0) {
+                // Recalculate statistics with current settings
+                const currentEntry = rollHistory[0];
+                if (currentEntry) {
+                    if (currentEntry.type === 'mixed') {
+                        const allResults = currentEntry.results.flatMap(r => r.results);
+                        updateStatistics(allResults, 'Mixed', currentEntry.baseTotal);
+                    } else {
+                        updateStatistics(currentEntry.results, currentEntry.sides, currentEntry.baseTotal);
+                    }
+                }
+            }
+        });
     });
 </script>
 </body>
-
 </html>
-
