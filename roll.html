@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SirObiVan's Dice Roller</title>
+    <style>
+        body {
+            font-family: "Times New Roman", serif;
+            background-image: url('90sstars.png');
+            background-repeat: repeat;
+            color: #000000;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #000080; /* Dark blue */
+            text-align: center;
+        }
+        a {
+            color: #0000FF;
+            text-decoration: underline;
+        }
+        .container {
+            width: 800px;
+            margin: 0 auto;
+            border: 2px solid #000;
+            background-color: #FFFFFF;
+            padding: 10px;
+        }
+        .nav {
+            background-color: #FFFFE0; /* Light yellow */
+            padding: 5px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .footer {
+            text-align: center;
+            font-size: small;
+            padding: 10px;
+            background-color: #E0E0E0;
+        }
+        .marquee {
+            color: #FF0000; /* Red scrolling text */
+            font-weight: bold;
+        }
+        .dice-selection {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+        .dice-option {
+            background-color: #E0E0E0;
+            border: 2px outset #C0C0C0;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-family: "Times New Roman", serif;
+        }
+        .dice-option:hover {
+            background-color: #D0D0D0;
+        }
+        .dice-option.active {
+            background-color: #000080;
+            color: white;
+            border-style: inset;
+        }
+        .dice-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #F0F0F0;
+            border: 1px solid #C0C0C0;
+        }
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .quantity-control input {
+            width: 50px;
+            padding: 5px;
+            border: 1px solid #808080;
+        }
+        button {
+            background-color: #C0C0C0;
+            color: black;
+            border: 2px outset #C0C0C0;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-family: "Times New Roman", serif;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #D0D0D0;
+        }
+        button:active {
+            border-style: inset;
+        }
+        .roll-button {
+            background-color: #008000;
+            color: white;
+            border: 2px outset #008000;
+            font-size: 1.1rem;
+            padding: 10px 25px;
+        }
+        .roll-button:hover {
+            background-color: #009000;
+        }
+        .results {
+            margin-top: 15px;
+            min-height: 100px;
+            border: 1px dashed #808080;
+            padding: 10px;
+            background-color: #F9F9F9;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px dotted #C0C0C0;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .total-result {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid #000080;
+            color: #FF0000;
+        }
+        .stats-box {
+            background-color: #F0F8FF;
+            border: 1px solid #87CEEB;
+            padding: 10px;
+            margin: 15px 0;
+        }
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .history {
+            margin-top: 20px;
+        }
+        .history h3 {
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #C0C0C0;
+        }
+        .history-list {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid #C0C0C0;
+            padding: 10px;
+            background-color: #F9F9F9;
+        }
+        .history-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #E0E0E0;
+            font-size: 0.9rem;
+        }
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .history-details {
+            background-color: #F5F5F5;
+            padding: 8px;
+            border-left: 3px solid #000080;
+        }
+        .history-results {
+            font-family: "Courier New", monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        .history-total {
+            font-weight: bold;
+            color: #FF0000;
+            margin-top: 5px;
+            padding-top: 5px;
+            border-top: 1px solid #C0C0C0;
+        }
+        .buttons {
+            text-align: center;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>SirObiVan's Dice Roller!</h1>
+
+    <!-- Marquee for classic scrolling text -->
+    <marquee class="marquee">Roll the dice for your tabletop gaming needs! Powered by cryptographically secure randomness!</marquee>
+
+    <!-- Navigation links -->
+    <div class="nav">
+        <a href="index.html">Home</a> | 
+        <a href="about.html">About</a> | 
+        <a href="resume.html">Resume</a> | 
+        <a href="contact.html">Contact</a> |
+        <a href="stars.html">Stars</a> |
+        <a href="dice.html">Dice Roller</a>
+    </div>
+
+    <!-- Main content -->
+    <table width="100%" cellpadding="10" cellspacing="0" border="1">
+        <tr>
+            <td>
+                <p><b>Welcome to the Dice Roller!</b></p>
+                <p>This dice roller uses cryptographically secure random number generation for truly random results!</p>
+                
+                <div class="dice-selection">
+                    <div class="dice-option active" data-sides="4">
+                        d4
+                    </div>
+                    <div class="dice-option" data-sides="6">
+                        d6
+                    </div>
+                    <div class="dice-option" data-sides="8">
+                        d8
+                    </div>
+                    <div class="dice-option" data-sides="10">
+                        d10
+                    </div>
+                    <div class="dice-option" data-sides="12">
+                        d12
+                    </div>
+                    <div class="dice-option" data-sides="20">
+                        d20
+                    </div>
+                    <div class="dice-option" data-sides="100">
+                        d100
+                    </div>
+                    <div class="dice-option" data-sides="2">
+                        Coin Flip
+                    </div>
+                </div>
+                
+                <div class="dice-controls">
+                    <div class="quantity-control">
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" id="quantity" min="1" max="100" value="1">
+                    </div>
+                    
+                    <button id="clear-results">Clear Results</button>
+                    <button id="roll-button" class="roll-button">Roll Dice</button>
+                </div>
+                
+                <div class="stats-box" id="stats-container">
+                    <p>Roll some dice to see statistics</p>
+                </div>
+                
+                <div class="results" id="results-container">
+                    <p>Select dice and click "Roll Dice" to get started!</p>
+                </div>
+                
+                <div class="history">
+                    <h3>Roll History</h3>
+                    <div class="history-list" id="history-container">
+                        <!-- History items will be added here -->
+                    </div>
+                </div>
+                
+                <img src="happy-1.gif" alt="happy" align="right" style="border: 2px solid #000; image-rendering: pixelated;">
+            </td>
+        </tr>
+    </table>
+
+    <!-- 80x15 GIF Buttons Section -->
+    <div class="buttons">
+        <a href="osu.gi"><img src="osu.gif" alt="osu" width="80" height="15"></a>
+        <a href="9_eire.png"><img src="9_eire.png" alt="eire" width="80" height="15"></a>
+        <a href="ilovemusic.png"><img src="ilovemusic.png" alt="music" width="80" height="15"></a>
+        <a href="xp.gif"><img src="xp.gif" alt="xp" width="80" height="15"></a>
+        <a href="coffeepower.png"><img src="coffeepower.png" alt="coffee" width="80" height="15"></a>
+        <a href="loveani.gif"><img src="loveani.gif" alt="love" width="80" height="15"></a>
+        <a href="ibm.gif"><img src="ibm.gif" alt="ibm" width="80" height="15"></a>
+    </div>
+    
+    <div class="footer">
+        <p>Copyright &copy; 2024 Preston Parsons. All rights reserved.</p>
+        <p><a href="mailto:ogaugeandcode@gmail.com">Email Me</a></p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // DOM elements
+        const diceOptions = document.querySelectorAll('.dice-option');
+        const quantityInput = document.getElementById('quantity');
+        const rollButton = document.getElementById('roll-button');
+        const clearButton = document.getElementById('clear-results');
+        const resultsContainer = document.getElementById('results-container');
+        const historyContainer = document.getElementById('history-container');
+        const statsContainer = document.getElementById('stats-container');
+        
+        // State variables
+        let selectedSides = 4;
+        let rollHistory = [];
+        
+        // Initialize dice selection
+        diceOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove active class from all options
+                diceOptions.forEach(opt => opt.classList.remove('active'));
+                // Add active class to clicked option
+                this.classList.add('active');
+                // Update selected sides
+                selectedSides = parseInt(this.getAttribute('data-sides'));
+            });
+        });
+        
+        // Roll button event listener
+        rollButton.addEventListener('click', function() {
+            const quantity = parseInt(quantityInput.value);
+            if (isNaN(quantity) || quantity < 1) {
+                alert('Please enter a valid quantity (1-100)');
+                return;
+            }
+            
+            if (quantity > 100) {
+                alert('Maximum 100 dice at a time for performance');
+                return;
+            }
+            
+            rollDice(selectedSides, quantity);
+        });
+        
+        // Clear results button
+        clearButton.addEventListener('click', function() {
+            resultsContainer.innerHTML = '<p>Select dice and click "Roll Dice" to get started!</p>';
+            statsContainer.innerHTML = '<p>Roll some dice to see statistics</p>';
+            rollHistory = [];
+            updateHistoryDisplay();
+        });
+        
+        // SIMPLIFIED AND CORRECTED random number generator
+        async function getSecureRandomInt(min, max) {
+            // Use Web Crypto API directly with proper range handling
+            const randomBuffer = new Uint32Array(1);
+            window.crypto.getRandomValues(randomBuffer);
+            
+            // Simple, reliable range conversion
+            const range = max - min + 1;
+            const maxRange = 0xFFFFFFFF; // Maximum 32-bit unsigned integer
+            
+            // Ensure we don't have modulo bias by using rejection sampling
+            const maxUnbiased = maxRange - (maxRange % range);
+            
+            let value;
+            do {
+                window.crypto.getRandomValues(randomBuffer);
+                value = randomBuffer[0];
+            } while (value >= maxUnbiased);
+            
+            // Convert to desired range and add min
+            const result = min + (value % range);
+            
+            // Final validation to ensure result is within bounds
+            if (result < min || result > max) {
+                console.error('Random number out of bounds:', result, 'Expected:', min, '-', max);
+                // Fallback: use Math.random() as backup (less secure but correct range)
+                return Math.floor(Math.random() * range) + min;
+            }
+            
+            return result;
+        }
+        
+        // Function to roll dice
+        async function rollDice(sides, quantity) {
+            // Clear previous results
+            resultsContainer.innerHTML = '';
+            
+            // Show rolling animation
+            resultsContainer.innerHTML = `<p>Rolling ${quantity}d${sides}...</p>`;
+            
+            try {
+                // Create an array of promises for all dice rolls
+                const rollPromises = [];
+                for (let i = 0; i < quantity; i++) {
+                    rollPromises.push(getSecureRandomInt(1, sides));
+                }
+                
+                // Wait for all rolls to complete
+                const results = await Promise.all(rollPromises);
+                
+                // Validate all results are within expected range
+                const invalidResults = results.filter(result => result < 1 || result > sides);
+                if (invalidResults.length > 0) {
+                    console.error('Invalid dice results detected:', invalidResults);
+                    throw new Error(`Generated ${invalidResults.length} invalid dice results`);
+                }
+                
+                // Calculate total
+                const total = results.reduce((sum, value) => sum + value, 0);
+                
+                // Display results
+                resultsContainer.innerHTML = '';
+                results.forEach((result, index) => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'result-item';
+                    
+                    // Special display for coin flip
+                    if (sides === 2) {
+                        const coinResult = result === 1 ? 'Heads' : 'Tails';
+                        resultItem.innerHTML = `
+                            <span>Coin ${index + 1}:</span>
+                            <span>${coinResult}</span>
+                        `;
+                    } else {
+                        resultItem.innerHTML = `
+                            <span>d${sides} ${index + 1}:</span>
+                            <span>${result}</span>
+                        `;
+                    }
+                    
+                    resultsContainer.appendChild(resultItem);
+                });
+                
+                // Display total if multiple dice
+                if (quantity > 1) {
+                    const totalElement = document.createElement('div');
+                    totalElement.className = 'total-result';
+                    totalElement.textContent = `Total: ${total}`;
+                    resultsContainer.appendChild(totalElement);
+                }
+                
+                // Update statistics
+                updateStatistics(results, sides);
+                
+                // Add to history
+                const historyEntry = {
+                    timestamp: new Date().toLocaleString(),
+                    sides: sides,
+                    quantity: quantity,
+                    results: results,
+                    total: total
+                };
+                
+                rollHistory.unshift(historyEntry);
+                if (rollHistory.length > 10) {
+                    rollHistory.pop();
+                }
+                
+                updateHistoryDisplay();
+                
+            } catch (error) {
+                console.error('Error rolling dice:', error);
+                resultsContainer.innerHTML = `<p style="color: #FF0000;">Error: ${error.message}. Please try again.</p>`;
+            }
+        }
+        
+        // Function to update statistics display
+        function updateStatistics(results, sides) {
+            // Calculate mean and standard deviation
+            const mean = results.reduce((a, b) => a + b, 0) / results.length;
+            const variance = results.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / results.length;
+            const stdDev = Math.sqrt(variance);
+            
+            // Expected values for fair dice
+            const expectedMean = (sides + 1) / 2;
+            const expectedStdDev = Math.sqrt((Math.pow(sides, 2) - 1) / 12);
+            
+            // Update stats display
+            statsContainer.innerHTML = `
+                <div class="stat-item">
+                    <span>Mean:</span>
+                    <span>${mean.toFixed(2)}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Std Dev:</span>
+                    <span>${stdDev.toFixed(2)}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Expected Mean:</span>
+                    <span>${expectedMean.toFixed(2)}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Rolls:</span>
+                    <span>${results.length}</span>
+                </div>
+            `;
+        }
+        
+        // Function to update history display
+        function updateHistoryDisplay() {
+            historyContainer.innerHTML = '';
+            
+            if (rollHistory.length === 0) {
+                historyContainer.innerHTML = '<p>No rolls yet</p>';
+                return;
+            }
+            
+            rollHistory.forEach((entry, index) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                
+                // Format the results array nicely
+                let resultsText;
+                if (entry.sides === 2) {
+                    // Format coin flip results
+                    const coinResults = entry.results.map(r => r === 1 ? 'Heads' : 'Tails');
+                    resultsText = coinResults.join(', ');
+                } else {
+                    // Show all results in a compact format
+                    resultsText = `[${entry.results.join(', ')}]`;
+                }
+                
+                // Create the history entry
+                historyItem.innerHTML = `
+                    <div class="history-header">
+                        <span>${entry.timestamp}</span>
+                        <span>${entry.quantity}d${entry.sides}</span>
+                    </div>
+                    <div class="history-details">
+                        <div class="history-results">
+                            ${resultsText}
+                        </div>
+                        ${entry.quantity > 1 ? `<div class="history-total">Total: ${entry.total}</div>` : ''}
+                    </div>
+                `;
+                
+                historyContainer.appendChild(historyItem);
+            });
+        }
+    });
+</script>
+</body>
+</html>
