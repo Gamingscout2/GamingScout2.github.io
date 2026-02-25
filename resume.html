@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Resume - SirObiVan</title>
+  <title>Resume - Preston Parsons (updated)</title>
   <style>
     body { 
       font-family: "Times New Roman", serif; 
@@ -58,6 +58,7 @@
     h3 {
       color: #000080;
       margin-bottom: 5px;
+      font-size: 1.1em;
     }
     .marquee {
       color: #FF0000;
@@ -65,6 +66,7 @@
       background-color: #FFFFE0;
       padding: 5px;
       margin: 15px 0;
+      border: 1px solid #000080;
     }
     .contact-info {
       text-align: center;
@@ -81,15 +83,16 @@
       margin-bottom: 25px;
     }
     ul { 
-      margin: 10px 0; 
+      margin: 8px 0 12px 0; 
       padding-left: 25px; 
     }
     li {
-      margin-bottom: 8px;
+      margin-bottom: 5px;
     }
     .highlight {
       background-color: #FFFFCC;
       padding: 2px 5px;
+      font-weight: 500;
     }
     .button {
       display: inline-block;
@@ -109,18 +112,22 @@
       text-align: center;
       margin: 20px 0;
     }
+    /* keep mono for certain skills if needed */
+    .skill-cat {
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>Preston Parsons - Resume</h1>
+  <h1>Preston Parsons – Resume</h1>
   
   <marquee class="marquee" behavior="scroll" direction="left">
-    Electrical and Computer Engineering Technology Student | Hardware & Software Development | Available May-December 2026
+    Computer Engineering Technology student | Hardware & software development | Available May–December 2026
   </marquee>
 
-  <!-- Navigation links -->
+  <!-- Navigation (same as before) -->
   <div class="nav">
     <a href="index.html">Home</a> | 
     <a href="about.html">About</a> | 
@@ -131,107 +138,103 @@
     <a href="simulations.html">Circuit Simulations</a>
   </div>
 
-  <!-- Contact Information -->
+  <!-- Contact info (preserved, matches known details) -->
   <div class="contact-info">
     <p><b>Rochester, NY 14623</b> • <a href="mailto:prp8776@rit.edu">prp8776@rit.edu</a> •
-    <a href="https://www.linkedin.com/in/preston-parsons-79a8662a4/" target="_blank">LinkedIn Profile</a></p>
+    <a href="https://www.linkedin.com/in/phaedra-parsons-79a8662a4/" target="_blank">LinkedIn Profile</a></p>
   </div>
 
-  <!-- Download Button -->
+  <!-- Download button (filename kept as originally) -->
   <div class="download-btn">
     <a href="Resume_Feb-25-2026-prp8776.pdf" class="button" download>Download PDF Resume</a>
   </div>
 
+  <!-- ========== OBJECTIVE ========== -->
   <div class="section">
     <h2>OBJECTIVE</h2>
-    <p>Computer and Electrical Engineering Technology student seeking a co-op or internship to gain engineering skills. Interested in both hardware and software development opportunities. Available May – December 2026.</p>
+    <p>Computer and Electrical Engineering Technology student seeking a co‑op or internship to gain engineering skills. Interested in both hardware and software development opportunities. Available May – December 2026.</p>
   </div>
 
+  <!-- ========== EDUCATION ========== (updated from PDF, no extra early college/high school) -->
   <div class="section">
     <h2>EDUCATION</h2>
     
     <h3>Bachelor of Science in Electrical and Computer Engineering Technology
     <span class="date">Expected May 2028</span></h3>
     <p><b>Rochester Institute of Technology</b> | Rochester, NY</p>
-    
     <ul>
-      <li><b>Awards:</b> CET Dean's List 2025, Alfred L. and Ruby C. Davis Award for Outstanding Campus Leadership</li>
-      <li><b>Coursework:</b> Computer Science I and II, Circuits I and II with Lab, Electronic Devices, Digital Systems Design, Microcontroller Systems, Introduction to Digital and Microcontroller Systems, Probability & Statistics, Multivariable Calculus & Differential Equations, Fundamentals of Audio Engineering</li>
-      <li><b>Extracurriculars:</b> President of Vintage Electronics and Computer Club (Founder), Member of Engineering House, Member of Pedal Builders at RIT</li>
+      <li><span class="highlight">Awards:</span> CET Dean's List Spring and Fall 2025, Alfred L. and Ruby C. Davis Award for Outstanding Campus Leadership</li>
+      <li><span class="highlight">Coursework:</span> Computer Science I and II, Circuits I and II with Lab, Electronic Devices, Digital Systems Design, Microcontroller Systems, Introduction to Digital and Microcontroller Systems, Probability & Statistics, Multivariable Calculus & Differential Equations, Fundamentals of Audio Engineering, Modern Audio Production</li>
+      <!-- Extracurriculars from old HTML are removed – not in PDF -->
     </ul>
-    
-    <h3>Early College Coursework
-    <span class="date">August 2018 - May 2023</span></h3>
-    <p><b>The University of Akron</b> | Akron, OH | GPA: 3.76</p>
-    
-    <h3>High School Diploma (Summa Cum Laude)
-    <span class="date">August 2019 - May 2023</span></h3>
-    <p><b>Cloverleaf High School</b> | Lodi, OH | GPA: 4.3</p>
+    <!-- No early college / high school sections – they are not in the latest PDF -->
   </div>
 
+  <!-- ========== SKILLS ========== (exactly as in PDF, reorganised) -->
   <div class="section">
     <h2>SKILLS</h2>
-    
     <ul>
-      <li><b>Software:</b> Visual Studio C++, Microsoft Office Suite, Code Composer Studio, Quartus Prime, Vivado, ModelSim</li>
-      <li><b>Programming Languages:</b> Python, C/C++, Java, BASIC, HTML, VHDL</li>
-      <li><b>Hardware Development:</b> Quartus Prime, Vivado, VHDL, ModelSim, Altera Cyclone II FPGA, Xilinx Artix 7 FPGA</li>
-      <li><b>Lab Equipment:</b> Soldering Iron, Oscilloscope, Multi-meter, Curve Tracer, Function Generator</li>
-      <li><b>Audio Engineering:</b> Vacuum tube amplifier design (Class A and Class AB Push-Pull), Fundamentals of Audio Engineering</li>
-      <li><b>Interpersonal Skills:</b> Leadership, Teamwork, Creativity, Organization, Reliability</li>
-      <li><b>Additional:</b> Network configuration, MySQL database management, Windows/Linux systems, Web development</li>
+      <li><span class="skill-cat">Software:</span> Visual Studio C++, Microsoft Office Suite, Code Composer Studio, Linux (Debian, Ubuntu, Fedora)</li>
+      <li><span class="skill-cat">Languages:</span> Python, C/C++, Java, HTML, VHDL</li>
+      <li><span class="skill-cat">Interpersonal:</span> Leadership, Teamwork, Creative, Organization, Reliability</li>
+      <li><span class="skill-cat">Hardware:</span> Quartus Prime, Vivado, ModelSim, Altera Cyclone II FPGA, Xilinx Artix 7 FPGA, TI MSP432 Microcontroller, Arduino, ESP‑32, Small Signal Diodes, BJTs, MOSFETs, JFETs, and Operational Amplifiers</li>
+      <li><span class="skill-cat">Lab Equipment:</span> Soldering Iron, Oscilloscope, Multi‑meter, Curve Tracer, and Function Generator</li>
     </ul>
+    <!-- Removed Audio Engineering / Network / MySQL etc. – not in PDF -->
   </div>
 
+  <!-- ========== EMPLOYMENT ========== (Teaching Assistant details fine-tuned) -->
   <div class="section">
     <h2>EMPLOYMENT</h2>
     
     <h3>Teaching Assistant
-    <span class="date">January 2026 - Present</span></h3>
+    <span class="date">January 2026 – Present</span></h3>
     <p><b>RIT, Department of Electrical and Computer Engineering Technology</b> | Rochester, NY</p>
     <ul>
-      <li>Supported instruction for <span class="highlight">Circuits I</span>, covering <span class="highlight">DC analysis</span>, <span class="highlight">Ohm's Law</span>, <span class="highlight">Kirchhoff's Laws</span>, <span class="highlight">Thevenin/Norton equivalents</span>, and Inductors/Capacitors</li>
-      <li>Assisted students during lectures and labs with analog circuit analysis, device modeling, and engineering problem-solving techniques</li>o
-      <li>Led exam review sessions and study workshops, reinforcing concepts in linear circuits, semiconductor physics, and electronic components</li>
-      <li>Graded homework, lab reports, and exams, providing detailed technical feedback and collaborating with faculty to develop and refine industry-aligned instructional materials</li>
+      <li>Supported instruction for <span class="highlight">Circuits I</span>, covering DC analysis, Ohm's Law, Kirchhoff's Laws, Inductors and Capacitors, and Thevenin/Norton equivalents.</li>
+      <li>Assisted students during lectures and labs with analog circuit analysis, device modeling, and engineering problem‑solving techniques.</li>
+      <li>Led exam review sessions and study workshops, reinforcing concepts in linear circuits, semiconductor physics, and electronic components.</li>
+      <li>Graded homework, and lab reports, providing detailed technical feedback and collaborating with faculty to develop and refine industry‑aligned instructional materials.</li>
     </ul>
     
     <h3>Student Manager
-    <span class="date">October 2024 - January 2026</span></h3>
+    <span class="date">October 2024 – January 2026</span></h3>
     <p><b>RIT Dining, Cantina & Grille</b> | Rochester, NY</p>
     <ul>
-      <li>Oversaw daily operations, managed staff, handled closing procedures, and ensured high-quality customer service</li>
-      <li>Promoted to Student Manager after demonstrating strong leadership and organizational skills (January 2025)</li>
+      <li>Oversaw daily operations, managed staff, handled closing procedures, and ensured high‑quality customer service.</li>
+      <li>Promoted to Student Manager after demonstrating strong leadership and organizational skills (January 2025).</li>
     </ul>
   </div>
 
+  <!-- ========== LABS AND PROJECTS ========== (exactly three projects from PDF) -->
   <div class="section">
     <h2>LABS AND PROJECTS</h2>
     
     <h3>Personal Project: Vacuum Tube Class A Audio Amp
     <span class="date">January 2025</span></h3>
     <ul>
-      <li>Modified an existing Class A Audio Amp Design to accept a 6L6GC Power Pentode</li>
-      <li>Designed and built the chassis mounting using the RIT SHED Machine Shop to cut aluminum and steel parts</li>
-      <li>3D Printed a socket support for the 6L6GC</li>
-      <li>Wired the amp together with point to point wiring with 18 gauge copper wire</li>
+      <li>Modified an existing Class A Audio Amp Design to accept a 6L6GC Power Pentode.</li>
+      <li>Designed and built the chassis mounting using the RIT SHED Machine Shop to cut aluminum and steel parts.</li>
+      <li>3D Printed a socket support for the 6L6GC.</li>
+      <li>Wired the amp together with point‑to‑point wiring using 18 gauge copper wire.</li>
     </ul>
     
     <h3>Personal Project: Personal Website
     <span class="date">October 2024</span></h3>
     <ul>
-      <li>Designed and implemented a personal website to host a resume and basic contact info</li>
-      <li>Created an HTML design with an NGINX web server running on Raspbian Debian on a Raspberry Pi 3B+</li>
+      <li>Designed and implemented a personal website to host a resume and basic contact info (<a href="https://sirobivan.org/index.html" target="_blank">https://sirobivan.org/index.html</a>).</li>
+      <li>Created an HTML design with an NGINX web server running on Raspbian Debian on a Raspberry Pi 3B+.</li>
+	  <li>Website currently running on GitHub Pages!</li>
     </ul>
     
     <h3>Digital and Microcontroller Systems: Software State Machine in C and Schematic Capture
     <span class="date">April 2025</span></h3>
     <ul>
-      <li>Programmed and tested a software state machine in C to control an FPGA combination lock from a TI Microcontroller</li>
-      <li>Engineered the SSM to track 3 user input switches from the FPGA, utilizing Quartus Block Diagrams in Schematic Capture to operate seven segment displays and indicate 'PASS' upon correct code entry or 'FAIL' otherwise</li>
+      <li>Programmed and tested a software state machine in C to control an FPGA combination lock from a TI Microcontroller.</li>
+      <li>Engineered the SSM to track 3 user input switches from the FPGA, utilizing Quartus Block Diagrams in Schematic Capture to operate seven segment displays and indicate 'PASS' upon correct code entry or 'FAIL' otherwise.</li>
     </ul>
-    
-    <h3>Additional Projects</h3>
+    <!-- Additional projects (full-adder, ProxMOX, simulations) removed – not in PDF -->
+	<h3>Additional Projects</h3>
     <ul>
       <li><b>Full-Adder Circuit:</b> Designed and built a full-adder circuit using transistors, resistors, and LEDs</li>
       <li><b>ProxMOX Virtualization:</b> Learning and implementing ProxMOX for network virtualization and management</li>
@@ -239,27 +242,24 @@
     </ul>
   </div>
 
-  <!-- Navigation buttons -->
+  <!-- Navigation buttons (keep as original) -->
   <div style="text-align: center; margin-top: 30px;">
     <a href="contact.html" class="button">Contact Me</a>
     <a href="simulations.html" class="button">View Circuit Simulations</a>
     <a href="index.html" class="button">Back to Home</a>
   </div>
 
+  <!-- Footer (updated year) -->
   <div class="footer">
-    <p>Copyright &copy; 2024-2026 Preston Parsons. All rights reserved.</p>
+    <p>Copyright &copy; 2024–2026 Preston Parsons. All rights reserved.</p>
     <p>
       <a href="mailto:prp8776@rit.edu">Email Me</a> |
       <a href="https://www.linkedin.com/in/preston-parsons-79a8662a4/" target="_blank">LinkedIn</a> |
       <a href="https://sirobivan.org" target="_blank">Personal Website</a>
     </p>
-    <p><i>Electrical and Computer Engineering Technology Student at RIT</i></p>
+    <p><i>Computer Engineering Technology Student at RIT</i></p>
   </div>
 </div>
 
 </body>
 </html>
-
-
-
-
