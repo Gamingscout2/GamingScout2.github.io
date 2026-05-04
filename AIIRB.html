@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIIRB - Autonomous IR Imaging and Rangefinding Bot</title>
+  <style>
+    body {
+      font-family: "Times New Roman", serif;
+      background-image: url('90sstars.png');
+      background-repeat: repeat;
+      color: #000000;
+      margin: 20px;
+    }
+    h1, h2, h3 {
+      color: #000080;
+    }
+    h1 {
+      text-align: center;
+    }
+    a {
+      color: #0000FF;
+      text-decoration: underline;
+    }
+    .container {
+      width: 900px;
+      margin: 0 auto;
+      border: 2px solid #000;
+      background-color: #FFFFFF;
+      padding: 15px;
+    }
+    .nav {
+      background-color: #FFFFE0;
+      padding: 5px;
+      margin-bottom: 15px;
+      text-align: center;
+      border: 1px solid #000;
+    }
+    .footer {
+      text-align: center;
+      font-size: small;
+      padding: 10px;
+      background-color: #E0E0E0;
+      margin-top: 15px;
+      border-top: 1px solid #000;
+    }
+    .marquee {
+      color: #FF0000;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 15px 0;
+    }
+    th, td {
+      border: 1px solid #000;
+      padding: 10px;
+      vertical-align: top;
+    }
+    .image-gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-around;
+      margin: 15px 0;
+    }
+    .image-gallery figure {
+      border: 2px solid #000;
+      padding: 5px;
+      background: #FFFFE0;
+      text-align: center;
+      width: 30%;
+    }
+    .image-gallery img {
+      width: 100%;
+      height: auto;
+      border: 1px solid #000;
+    }
+    .video-container {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .video-container video {
+      border: 2px solid #000;
+      width: 100%;
+      max-width: 640px;
+      height: auto;
+    }
+    .component-list {
+      list-style-type: square;
+      padding-left: 20px;
+    }
+    .state-machine {
+      background: #FFFFE0;
+      border: 1px solid #000;
+      padding: 10px;
+      margin: 10px 0;
+      overflow-x: auto;
+    }
+    .state-machine pre {
+      margin: 0;
+      font-family: "Courier New", monospace;
+    }
+    hr {
+      border: 1px solid #000080;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>AIIRB</h1>
+  <h2 style="text-align:center;">Autonomous IR Imaging and Rangefinding Bot</h2>
+  <h3 style="text-align:center;">Microcontrollers Final Project · RIT CPET-253 · Spring 2025</h3>
+
+  <marquee class="marquee">Welcome to the AIIRB Project Page! An autonomous robot that navigates using ultrasonic rangefinding and captures thermal images with a Raspberry Pi camera.</marquee>
+
+  <div class="nav">
+    <a href="#description">Description</a> |
+    <a href="#concept">Conceptualization</a> |
+    <a href="#design">Design Overview</a> |
+    <a href="#challenges">Obstacles</a> |
+    <a href="#testing">Testing</a> |
+    <a href="#media">Media</a> |
+    <a href="#improvements">Improvements</a>
+  </div>
+
+  <!-- PROJECT DESCRIPTION -->
+  <h2 id="description"> Project Description</h2>
+  <table>
+    <tr>
+      <td>
+        <p><b>AIIRB</b> is an autonomous mobile robot built on the TI MSP432P401R LaunchPad. It is designed to explore an unknown environment by continuously scanning ahead with an ultrasonic range‑finder mounted on a servo, selecting the direction with the most open space, and driving forward until it encounters an obstacle. When a bump sensor is triggered, the robot backs up and rescans.</p>
+        <p>Simultaneously, a Raspberry Pi with an infrared camera is triggered at each decision point to capture thermal images. The images are saved for later analysis, making the platform suitable for thermal inspection, search &amp; rescue simulations, or educational robotics projects.</p>
+        <p><b>Key hardware components:</b></p>
+        <ul class="component-list">
+          <li>TI MSP432P401R LaunchPad (main controller)</li>
+          <li>HC-SR04 Ultrasonic Sensor (rangefinding)</li>
+          <li>Servo (sweeps ultrasonic sensor 0°–180°)</li>
+          <li>Bump switches (edge collision detection)</li>
+          <li>Two DC motors with individual PWM control</li>
+          <li>Raspberry Pi 3B+ with IR camera (low-light imaging)</li>
+          <li>Wi‑Fi Access Point (manual live‑streaming mode)</li>
+        </ul>
+      </td>
+    </tr>
+  </table>
+
+  <!-- ORIGINAL CONCEPTUALIZATION -->
+  <h2 id="concept"> Original Conceptualization</h2>
+  <table>
+    <tr>
+      <td>
+        <p>The project was inspired by the idea of a low‑cost, autonomous inspection robot that could navigate inside a building while capturing infrared images, useful for detecting heat leaks, overheating electrical panels, or locating people in low‑visibility conditions.</p>
+        <p>The MSP432 would handle real‑time control (motor PWM, servo position, ultrasonic timing, and bump interrupts), while a Raspberry Pi would manage the IR camera and provide Wi‑Fi connectivity for live video streaming. The two boards communicate via simple GPIO handshake signals.</p>
+        <p>The navigation strategy uses a state machine (SCAN → TURN → FORWARD → BUMP) that prefers straight movement unless a clear side path offers significantly more room, implementing hysteresis to prevent oscillation.</p>
+      </td>
+    </tr>
+  </table>
+
+  <!-- DESIGN OVERVIEW -->
+  <h2 id="design"> Design Overview</h2>
+  <table>
+    <tr>
+      <td>
+        <h3> Navigation State Machine</h3>
+        <div class="state-machine">
+          <pre>
+    ┌─────────┐     bump detected   ┌──────┐
+    │  SCAN   │◄────────────────────│ BUMP │
+    └─┬───┬───┘                     └──┬───┘
+      │   │          all blocked       │
+      │   └───────────────────────────►│
+      │                                │
+      ▼                                │
+    ┌──────┐   bump detected           │
+    │ T90  │─────────────────────────► │
+    └──────┘                           │
+    ┌──────┐                           │
+    │ T0   │─────────────────────────► │
+    └──────┘                           │
+    ┌──────┐                           │
+    │ T180 │─────────────────────────► │
+    └──────┘                           │
+          </pre>
+        </div>
+        <p><b>State Descriptions:</b></p>
+        <ul>
+          <li><b>SCAN</b> – Stop motors, trigger camera, sweep ultrasonic to 0°, 90°, 180°. Measure distances, apply hysteresis to choose best direction.</li>
+          <li><b>T0 / T90 / T180</b> – Turn to the selected angle, take a picture, then drive forward until bump interrupt.</li>
+          <li><b>BUMP</b> – Reverse for 1 second, then return to SCAN.</li>
+        </ul>
+
+        <h3> Software Modules</h3>
+        <ul>
+          <li><b>Motor.c</b> – PWM‑based motor control (Forward, Backward, Left, Right, Stop) using TimerA0.</li>
+          <li><b>BumpInt.c</b> – Hardware interrupt handler for six bump sensors (Port4, falling‑edge). Sets <code>leftBump</code>, <code>rightBump</code>, and <code>wasInterrupt</code> flags.</li>
+          <li><b>Servo/PWM</b> – TimerA3 generates 20 ms period PWM; pulse width varied to sweep ultrasonic sensor.</li>
+          <li><b>Ultrasonic (distanceInCm, pulseIn)</b> – TimerA2 captures echo pulse width; distance calculated using speed of sound.</li>
+          <li><b>takePicture()</b> – GPIO handshake triggers Raspberry Pi camera via Port8 pins.</li>
+        </ul>
+      </td>
+    </tr>
+  </table>
+
+  <!-- OBSTACLES FACED -->
+  <h2 id="challenges"> Obstacles Faced</h2>
+  <table>
+    <tr>
+      <td>
+        <table width="100%" cellpadding="5">
+          <tr><th width="25%">Challenge</th><th>Solution</th></tr>
+          <tr>
+            <td><b>Wi‑Fi Hotspot &amp; Streaming</b></td>
+            <td>Setting up the Raspberry Pi as a Wi‑Fi access point (AP) and streaming live video proved difficult. The script required precise dependencies and system configuration. Additionally, the Pi’s Python virtual environment had to be invoked with <code>sudo</code> using the full path to the venv Python interpreter to retain hardware access while loading the proper packages (<code>picamera2</code>, <code>flask</code>, <code>rpi-networking</code>).</td>
+          </tr>
+          <tr>
+            <td><b>Motor Speed Calibration</b></td>
+            <td>The two DC motors did not rotate at the same speed under identical PWM duty cycles, causing the robot to veer off course. The issue was resolved by manually adjusting the left and right PWM duty cycles (<code>R_DUTY = 13499</code>, <code>L_DUTY = 14999</code>) were fine‑tuned after repeated straight‑line tests) until consistent forward motion was achieved.</td>
+          </tr>
+          <tr>
+            <td><b>Ultrasonic Sensor Recalibration &amp; Port Fried</b></td>
+            <td>The original ultrasonic sensor port (Port6) was damaged, likely due to an accidental short. The wiring was moved to Port7, requiring changes in <code>Init_Ports.c</code> and <code>#define</code> macros (<code>TRIGGER</code>, <code>ECHO</code>). The sensor also needed recalibration: the timeout value was tuned, and the formula for converting pulse width to distance was verified against known reference lengths.</td>
+          </tr>
+          <tr>
+            <td><b>State Machine Debugging</b></td>
+            <td>Initial versions caused the robot to oscillate between forward and scan states. Adding hysteresis (<code>HYST_CM = 5</code>) and dead‑end detection (<code>DEAD_END_CM = 5</code>) prevented the robot from jittering when distances were nearly equal.</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <!-- TESTING AND VERIFICATION -->
+  <h2 id="testing"> Testing and Verification</h2>
+  <table>
+    <tr>
+      <td>
+        <p>The robot was tested inside a makeshift “room” constructed from cardboard bricks. The enclosed space simulated walls and corners, allowing the ultrasonic sensor and bump switches to be evaluated in a controlled environment.</p>
+        <p><b>Test Procedure:</b></p>
+        <ul>
+          <li>Power on the MSP432 and Raspberry Pi; verify Wi‑Fi AP appears (<code>RPi_Camera</code>).</li>
+          <li>Place robot in the center of the cardboard room.</li>
+          <li>Observe SCAN behavior: servo sweeps, distances logged via UART.</li>
+          <li>Verify direction selection: robot should turn toward most open space.</li>
+          <li>Confirm bump interrupt: robot reverses and rescans upon impact.</li>
+          <li>Connect to live stream using the IP address generated by the PI in manual mode.</li>
+          <li>Review captured thermal images stored on the Pi.</li>
+        </ul>
+        <p><b>Results:</b> The robot consistently navigated the cardboard enclosure without escaping. Hysteresis prevented unnecessary turn oscillations. Bump detection worked reliably. Wi‑Fi streaming delivered a smooth 640×480 MJPEG feed with acceptable latency.</p>
+      </td>
+    </tr>
+  </table>
+
+  <!-- MEDIA -->
+  <h2 id="media"> Pictures &amp; Video</h2>
+  <table>
+    <tr>
+      <td>
+        <h3>Image Gallery</h3>
+        <div class="image-gallery">
+          <figure>
+            <img src="AIIRB_Front.jpg" alt="AIIRB Front view">
+            <figcaption>Front view of AIIRB</figcaption>
+          </figure>
+          <figure>
+            <img src="AIIRB_Rear.jpg" alt="AIIRB Rear view">
+            <figcaption>Rear view of AIIRB</figcaption>
+          </figure>
+          <figure>
+            <img src="Testing_Image_Capture.jpg" alt="Sample image">
+            <figcaption>Sample image captured by Raspberry Pi (TA Shams)</figcaption>
+          </figure>
+        </div>
+
+        <hr>
+
+        <h3>Demonstration Video</h3>
+        <div class="video-container">
+          <video controls poster="video_poster.jpg" preload="metadata">
+            <source src="Demonstration.mov" type="video/mp4">
+            Your browser does not support the video tag. 
+            <a href="Demonstration.mov">Download the video</a>.
+          </video>
+        </div>
+
+        <h3>IR Emitter Test Video</h3>
+        <div class="video-container">
+          <video controls>
+            <source src="IR_Emitter_Test.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+            <a href="IR_Emitter_Test.mp4">Download the video</a>.
+          </video>
+        </div>
+
+        <h3>Full Testing Video</h3>
+        <div class="video-container">
+          <video controls>
+            <source src="Testing_video.mov" type="video/mp4">
+            Your browser does not support the video tag.
+            <a href="Testing_video.mov">Download the video</a>.
+          </video>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- POSSIBLE IMPROVEMENTS -->
+  <h2 id="improvements">Possible Improvements (with more time)</h2>
+  <table>
+    <tr>
+      <td>
+        <ul>
+          <li><b>Finer angular resolution:</b> Restore the 45° and 135° scan positions (commented out in code) to improve navigation in complex environments.</li>
+          <li><b>Wi‑Fi handshake robustness:</b> Implement two‑way GPIO handshake so the MSP432 waits for a “ready” pulse from the Pi before moving the servo, ensuring every angle is captured.</li>
+          <li><b>Sensor fusion:</b> Add wheel encoders for odometry and an IMU for heading estimation, enabling more precise turns and dead‑reckoning.</li>
+          <li><b>Thermal anomaly detection:</b> Run a lightweight machine‑learning model on the Raspberry Pi to flag unusual heat signatures in real time.</li>
+          <li><b>Remote control web interface:</b> Extend the Flask server to include buttons for manual drive and servo control, plus a live thermal overlay.</li>
+          <li><b>Battery monitoring:</b> Add ADC reading of the battery voltage to trigger a low‑power warning before the robot stops unexpectedly.</li>
+          <li><b>Enclosure design:</b> 3D print a protective shell that houses all electronics neatly while exposing the ultrasonic sensor and camera.</li>
+        </ul>
+      </td>
+    </tr>
+  </table>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p>Copyright © 2026 Phaedra Parsons. All rights reserved.</p>
+    <p>
+      <a href="mailto:prp8776@rit.edu">Email</a> |
+      <a href="https://www.linkedin.com/in/phaedra-parsons-79a8662a4/" target="_blank">LinkedIn</a>
+    </p>
+    <p style="font-size:x-small;">Best viewed in Netscape Navigator 4.0 or later.</p>
+  </div>
+</div>
+
+</body>
+</html>
+</html>
